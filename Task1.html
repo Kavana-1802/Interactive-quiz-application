@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Current Affairs Quiz</title>
+  <style>
+    * { box-sizing: border-box; font-family: "Poppins", sans-serif; }
+
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #333;
+    }
+
+    .container {
+      background: #fff;
+      width: 440px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      padding: 30px 40px;
+      text-align: center;
+      animation: fadeIn 0.6s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 { color: #222; margin-bottom: 20px; font-size: 26px; letter-spacing: 1px; }
+
+    p { color: #555; font-size: 15px; line-height: 1.5; }
+
+    .btn {
+      display: block;
+      width: 100%;
+      background: #f1f1f1;
+      border: none;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin: 10px 0;
+    }
+
+    .btn:hover {
+      background: #e0e0ff;
+      transform: scale(1.03);
+    }
+
+    .question {
+      font-weight: 600;
+      font-size: 18px;
+      margin-bottom: 15px;
+      color: #222;
+    }
+
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .options button {
+      background: #f1f1f1;
+      border: none;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .options button:hover { background: #e0e0ff; }
+    .correct { background-color: #4caf50 !important; color: white; }
+    .wrong { background-color: #f44336 !important; color: white; }
+
+    #next-btn {
+      margin-top: 20px;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      display: none;
+    }
+
+    #next-btn:hover { background: linear-gradient(90deg, #5a67d8, #6b46c1); }
+
+    #feedback { margin-top: 10px; font-weight: bold; }
+
+    .score-container {
+      font-size: 20px;
+      font-weight: bold;
+      color: #333;
+      margin-top: 20px;
+    }
+
+    .progress {
+      font-size: 14px;
+      color: #777;
+      margin-bottom: 15px;
+    }
+
+    #restart-btn {
+      margin-top: 20px;
+      background: #4caf50;
+      color: white;
+      border: none;
+      padding: 10px 25px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      display: none;
+    }
+
+    #restart-btn:hover { background: #43a047; }
+  </style>
+</head>
+<body>
+  <div class="container" id="quiz-container">
+
+    <!-- FRONT PAGE -->
+    <div id="front-page">
+      <h1>📰 Current Affairs Quiz</h1>
+      <p><strong>Instructions:</strong></p>
+      <p>
+        1️⃣ Select your preferred difficulty level.<br>
+        2️⃣ Each question has one correct answer.<br>
+        3️⃣ Get instant feedback after answering.<br>
+        4️⃣ Final score will be displayed at the end.<br><br>
+        Test your knowledge of recent world and national events!
+      </p>
+      <button class="btn" onclick="goToDifficulty()">Start Quiz</button>
+    </div>
+
+    <!-- DIFFICULTY SELECTION -->
+    <div id="difficulty-selection" style="display:none;">
+      <h1>Select Difficulty</h1>
+      <button class="btn" onclick="startQuiz('easy')">Easy</button>
+      <button class="btn" onclick="startQuiz('medium')">Medium</button>
+      <button class="btn" onclick="startQuiz('hard')">Hard</button>
+    </div>
+
+    <!-- QUIZ AREA -->
+    <div id="quiz" style="display:none;">
+      <div class="progress" id="progress"></div>
+      <div class="question" id="question"></div>
+      <div class="options" id="options"></div>
+      <div id="feedback"></div>
+      <button id="next-btn">Next</button>
+      <div class="score-container" id="score"></div>
+      <button id="restart-btn" onclick="restartQuiz()">Restart</button>
+    </div>
+  </div>
+
+  <script>
+    const questions = {
+      easy: [
+        { question: "Who is the current Prime Minister of India (2025)?", options: ["Narendra Modi", "Rahul Gandhi", "Amit Shah", "Arvind Kejriwal"], answer: "Narendra Modi" },
+        { question: "Where were the 2024 Olympic Games held?", options: ["Paris", "Tokyo", "London", "Beijing"], answer: "Paris" },
+        { question: "Which country recently joined BRICS in 2024?", options: ["Saudi Arabia", "France", "Canada", "Japan"], answer: "Saudi Arabia" },
+        { question: "Who is the current Chief Justice of India (2025)?", options: ["D.Y. Chandrachud", "N.V. Ramana", "U.U. Lalit", "Sharad Bobde"], answer: "D.Y. Chandrachud" },
+        { question: "Which Indian state launched 'Gruha Lakshmi Yojana' in 2024?", options: ["Karnataka", "Tamil Nadu", "Kerala", "Telangana"], answer: "Karnataka" }
+      ],
+      medium: [
+        { question: "Which company became the first to reach $4 trillion market value in 2025?", options: ["Apple", "Microsoft", "Google", "Amazon"], answer: "Apple" },
+        { question: "Who is the current President of the United States (2025)?", options: ["Joe Biden", "Donald Trump", "Kamala Harris", "Barack Obama"], answer: "Joe Biden" },
+        { question: "In 2025, which Indian city hosted the G20 Summit?", options: ["Delhi", "Mumbai", "Bengaluru", "Hyderabad"], answer: "Delhi" },
+        { question: "Which country won the ICC T20 World Cup 2024?", options: ["India", "England", "Australia", "South Africa"], answer: "India" },
+        { question: "Who won the Miss World 2024 title?", options: ["Krystyna Pyszková", "Manushi Chhillar", "Sini Shetty", "Vanessa Ponce"], answer: "Krystyna Pyszková" }
+      ],
+      hard: [
+        { question: "Which nation successfully launched the 'Artemis III' lunar mission in 2025?", options: ["Russia", "USA", "China", "India"], answer: "USA" },
+        { question: "Who won the Nobel Peace Prize 2024?", options: ["Volodymyr Zelenskyy", "Greta Thunberg", "Iranian Women’s Rights Activists", "Elon Musk"], answer: "Iranian Women’s Rights Activists" },
+        { question: "Which Indian bank recently merged with HDFC Bank?", options: ["HDFC Ltd", "ICICI", "Axis Bank", "SBI"], answer: "HDFC Ltd" },
+        { question: "Which country hosted the COP29 climate summit?", options: ["Azerbaijan", "UAE", "Egypt", "Brazil"], answer: "Azerbaijan" },
+        { question: "Who became the new CEO of OpenAI in 2025?", options: ["Sam Altman", "Satya Nadella", "Greg Brockman", "Sundar Pichai"], answer: "Sam Altman" }
+      ]
+    };
+
+    let quizData = [];
+    let currentQuestion = 0;
+    let score = 0;
+
+    const frontPage = document.getElementById("front-page");
+    const difficultyDiv = document.getElementById("difficulty-selection");
+    const quizDiv = document.getElementById("quiz");
+    const questionEl = document.getElementById("question");
+    const optionsEl = document.getElementById("options");
+    const nextBtn = document.getElementById("next-btn");
+    const feedbackEl = document.getElementById("feedback");
+    const scoreEl = document.getElementById("score");
+    const progressEl = document.getElementById("progress");
+    const restartBtn = document.getElementById("restart-btn");
+
+    function goToDifficulty() {
+      frontPage.style.display = "none";
+      difficultyDiv.style.display = "block";
+    }
+
+    function startQuiz(level) {
+      quizData = questions[level];
+      difficultyDiv.style.display = "none";
+      quizDiv.style.display = "block";
+      currentQuestion = 0;
+      score = 0;
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      const q = quizData[currentQuestion];
+      questionEl.textContent = q.question;
+      feedbackEl.textContent = "";
+      optionsEl.innerHTML = "";
+      progressEl.textContent = `Question ${currentQuestion + 1} of ${quizData.length}`;
+      nextBtn.style.display = "none";
+      scoreEl.textContent = "";
+
+      q.options.forEach(option => {
+        const btn = document.createElement("button");
+        btn.textContent = option;
+        btn.classList.add("btn");
+        btn.addEventListener("click", () => checkAnswer(btn, q.answer));
+        optionsEl.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(selectedBtn, correctAnswer) {
+      const buttons = optionsEl.querySelectorAll("button");
+      buttons.forEach(btn => btn.disabled = true);
+
+      if (selectedBtn.textContent === correctAnswer) {
+        selectedBtn.classList.add("correct");
+        feedbackEl.textContent = "✅ Correct!";
+        score++;
+      } else {
+        selectedBtn.classList.add("wrong");
+        feedbackEl.textContent = "❌ Wrong!";
+      }
+
+      nextBtn.style.display = "block";
+    }
+
+    nextBtn.addEventListener("click", () => {
+      currentQuestion++;
+      if (currentQuestion < quizData.length) {
+        loadQuestion();
+      } else {
+        showScore();
+      }
+    });
+
+    function showScore() {
+      questionEl.textContent = "🎉 Quiz Completed!";
+      optionsEl.innerHTML = "";
+      nextBtn.style.display = "none";
+      feedbackEl.textContent = "";
+      progressEl.textContent = "";
+      scoreEl.textContent = `Your Final Score: ${score} / ${quizData.length}`;
+      restartBtn.style.display = "inline-block";
+    }
+
+    function restartQuiz() {
+      restartBtn.style.display = "none";
+      quizDiv.style.display = "none";
+      frontPage.style.display = "block";
+    }
+  </script>
+</body>
+</html>
+
